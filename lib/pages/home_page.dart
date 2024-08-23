@@ -78,7 +78,7 @@ class _HomePageState extends State<HomePage> {
   Widget build(BuildContext context) {
     final controller = Get.put(NavigationController());
     //access auth service
-    final _auth = AuthService();
+    
 
     //SCAFOLD
     return Scaffold(

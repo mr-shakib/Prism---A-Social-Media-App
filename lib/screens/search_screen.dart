@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
-import 'package:prism/helper/naviagte_pages.dart';
-import 'package:prism/screens/home_screen.dart';
 import 'package:provider/provider.dart';
 
 import '../components/my_user_tile.dart';

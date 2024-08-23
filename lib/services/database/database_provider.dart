@@ -228,12 +228,9 @@ class DatabaseProvider extends ChangeNotifier {
   }
 
   // add a comment
-  Future<void> addComment(String postId, message) async {
-    //add comment in firebase
+  Future<void> addComment(String postId, String message) async {
     await _db.addCommentInFirebase(postId, message);
-
-    //reload comments
-    await loadComments(postId);
+    await loadCommentsAndReplies(postId);
   }
 
   //delete a comment
@@ -243,6 +240,25 @@ class DatabaseProvider extends ChangeNotifier {
 
     //reload comments
     await loadComments(commentId);
+  }
+
+  // Update the _comments map to store all comments and replies
+
+  // Get comments and replies for a post
+  List<Comment> getCommentsAndReplies(String postId) => _comments[postId] ?? [];
+
+  // Fetch comments and replies from database for a post
+  Future<void> loadCommentsAndReplies(String postId) async {
+    final allComments = await _db.getCommentsAndRepliesFromFirebase(postId);
+    _comments[postId] = allComments;
+    notifyListeners();
+  }
+
+  // Add a comment reply
+  Future<void> addCommentReply(
+      String postId, String parentCommentId, String message) async {
+    await _db.addCommentReplyInFirebase(postId, parentCommentId, message);
+    await loadCommentsAndReplies(postId);
   }
 
   /*
@@ -526,26 +542,24 @@ SEARCH USERS
 */
 
 //list of search resulkt
-List<UserProfile> _searchResults = [];
+  List<UserProfile> _searchResults = [];
 
 //get list of search result
-List<UserProfile> get searchResults => _searchResults;
+  List<UserProfile> get searchResults => _searchResults;
 
 //method to search for a user
-Future<void> searchUsers(String searchTerms) async {
-  try {
-    //get list of search result from firebase
-    final results = await _db.searchUsersInFirebase(searchTerms);
+  Future<void> searchUsers(String searchTerms) async {
+    try {
+      //get list of search result from firebase
+      final results = await _db.searchUsersInFirebase(searchTerms);
 
-    //update local data
-    _searchResults = results;
+      //update local data
+      _searchResults = results;
 
-    //update ui
-    notifyListeners();
+      //update ui
+      notifyListeners();
+    } catch (e) {
+      print(e);
+    }
   }
-  catch (e) {
-    print(e);
-  }
-}
-
 }

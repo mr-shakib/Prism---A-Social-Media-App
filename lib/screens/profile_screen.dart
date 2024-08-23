@@ -1,4 +1,3 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:prism/components/my_bio_box.dart';
 import 'package:prism/components/my_input_alert_box.dart';
@@ -11,6 +10,7 @@ import '../components/my_follow_button.dart';
 import '../components/my_post_tile.dart';
 import '../pages/follow_list_page.dart';
 import '../services/database/database_provider.dart';
+
 
 /* 
 
@@ -117,11 +117,11 @@ class _ProfilePageState extends State<ProfileScreen> {
         context: context,
         builder: (context) => AlertDialog(
           title: const Text("Unfollow"),
-          content: Text("Are you sure you want to unfollow?"),
+          content: const Text("Are you sure you want to unfollow?"),
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(context),
-              child: Text("Cancel"),
+              child: const Text("Cancel"),
             ),
             TextButton(
                 onPressed: () async {
@@ -169,7 +169,7 @@ class _ProfilePageState extends State<ProfileScreen> {
           ? null
           : AppBar(
               leading: IconButton(
-                icon: Icon(Icons.arrow_back),
+                icon: const Icon(Icons.arrow_back),
                 onPressed: () => goHomePage(context),
               ),
               backgroundColor: Theme.of(context).colorScheme.surface,
@@ -179,27 +179,30 @@ class _ProfilePageState extends State<ProfileScreen> {
       //body
       body: ListView(
         children: [
-          SizedBox(height: 25),
+          const SizedBox(height: 25),
 
           //profile picture
-          Center(
-            child: Container(
-              decoration: BoxDecoration(
-                color: Theme.of(context).colorScheme.secondary,
-                borderRadius: BorderRadius.circular(25),
+          Stack(
+            children: [
+              CircleAvatar(
+                radius: 70,
+                backgroundImage: NetworkImage('https://static.vecteezy.com/system/resources/previews/036/594/092/non_2x/man-empty-avatar-photo-placeholder-for-social-networks-resumes-forums-and-dating-sites-male-and-female-no-photo-images-for-unfilled-user-profile-free-vector.jpg'),
               ),
-              padding: EdgeInsets.all(25),
-              child: Icon(
-                Icons.person,
-                size: 72,
-                color: Theme.of(context).colorScheme.primary,
-              ),
-            ),
+              Positioned(
+                bottom: 0,
+                right: 0,
+                child: IconButton(
+                  icon: const Icon(Icons.add_a_photo),
+                  onPressed: () {},
+                ),
+
+              )
+            ],
           ),
 
           Center(
             child: ShaderMask(
-              shaderCallback: (bounds) => LinearGradient(
+              shaderCallback: (bounds) => const LinearGradient(
                 colors: [
                   Colors.purple,
                   Colors.blue
@@ -209,7 +212,7 @@ class _ProfilePageState extends State<ProfileScreen> {
               ).createShader(bounds),
               child: Text(
                 _isLoading ? '' : user!.name,
-                style: TextStyle(
+                style: const TextStyle(
                   color: Colors
                       .white, // The color won't matter as the shader will override it
                   fontSize: 24,
@@ -227,7 +230,7 @@ class _ProfilePageState extends State<ProfileScreen> {
             ),
           ),
 
-          SizedBox(height: 25),
+          const SizedBox(height: 25),
 
           //profile stats -> number of post/ followers/following
           MyProfileStats(

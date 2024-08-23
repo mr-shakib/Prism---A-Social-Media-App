@@ -318,6 +318,69 @@ class DatabaseService {
       return [];
     }
   }
+
+  // Add a comment reply
+  Future<void> addCommentReplyInFirebase(
+      String postId, String parentCommentId, String message) async {
+    try {
+      String uid = _auth.currentUser!.uid;
+      UserProfile? user = await getUserInfoFromFirestore(uid);
+
+      Comment newReply = Comment(
+        id: '',
+        postId: postId,
+        parentCommentId: parentCommentId,
+        uid: uid,
+        name: user!.name,
+        username: user.username,
+        message: message,
+        timestamp: Timestamp.now(),
+      );
+
+      Map<String, dynamic> newReplyMap = newReply.toMap();
+
+      // Add the reply to the Comments collection
+      DocumentReference replyRef =
+          await _db.collection("Comments").add(newReplyMap);
+
+      // Update the parent comment's replyIds
+      await _db.collection("Comments").doc(parentCommentId).update({
+        'replyIds': FieldValue.arrayUnion([replyRef.id])
+      });
+    } catch (e) {
+      print(e);
+    }
+  }
+
+  // Fetch comments and replies for a post
+  Future<List<Comment>> getCommentsAndRepliesFromFirebase(String postId) async {
+    try {
+      QuerySnapshot snapshot = await _db
+          .collection("Comments")
+          .where('postId', isEqualTo: postId)
+          .get();
+
+      List<Comment> comments =
+          snapshot.docs.map((doc) => Comment.fromDocument(doc)).toList();
+
+      // Sort comments: top-level comments first, then replies
+      comments.sort((a, b) {
+        if (a.parentCommentId == null && b.parentCommentId == null) {
+          return b.timestamp.compareTo(a.timestamp);
+        } else if (a.parentCommentId == null) {
+          return -1;
+        } else if (b.parentCommentId == null) {
+          return 1;
+        } else {
+          return a.timestamp.compareTo(b.timestamp);
+        }
+      });
+
+      return comments;
+    } catch (e) {
+      return [];
+    }
+  }
   /* 
   
   ACCOUNT SETTINGS
@@ -469,7 +532,7 @@ class DatabaseService {
           .where('username', isLessThanOrEqualTo: '${searchTerms}\uf8ff')
           .get();
 
-          return snapshot.docs.map((doc) => UserProfile.fromDocument(doc)).toList();
+      return snapshot.docs.map((doc) => UserProfile.fromDocument(doc)).toList();
     } catch (e) {
       return [];
     }

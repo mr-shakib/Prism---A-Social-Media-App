@@ -34,7 +34,6 @@ class UserProfile {
   //firebase -> app
   //convert firestore document to user profile
 
-
   factory UserProfile.fromDocument(DocumentSnapshot doc) {
     return UserProfile(
       uid: doc['uid'],

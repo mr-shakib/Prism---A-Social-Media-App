@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:like_button/like_button.dart';
 import 'package:prism/components/my_input_alert_box.dart';
 import 'package:prism/helper/time_formatter.dart';
 import 'package:provider/provider.dart';
@@ -366,17 +367,22 @@ class _MyPostTileState extends State<MyPostTile> {
                 Row(
                   children: [
                     //like button
-                    GestureDetector(
-                      onTap: _toggleLikedPost,
-                      child: likedByCurrentUser
-                          ? const Icon(
-                              Icons.favorite,
-                              color: Colors.red,
-                            )
-                          : Icon(
-                              Icons.favorite_border,
-                              color: Theme.of(context).colorScheme.primary,
-                            ),
+                    LikeButton(
+                      size: 40.0,
+                      isLiked: likedByCurrentUser,
+                      likeBuilder: (bool isLiked) {
+                        return Icon(
+                          isLiked ? Icons.favorite : Icons.favorite_border,
+                          color: isLiked
+                              ? Colors.red
+                              : Theme.of(context).colorScheme.primary,
+                          size: 30.0,
+                        );
+                      },
+                      onTap: (bool isLiked) async {
+                        _toggleLikedPost(); 
+                        return !isLiked;
+                      },
                     ),
 
                     //like count
